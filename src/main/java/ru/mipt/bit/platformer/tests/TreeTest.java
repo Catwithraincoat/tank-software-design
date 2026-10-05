@@ -1,22 +1,21 @@
 package ru.mipt.bit.platformer.tests;
 
-
 import com.badlogic.gdx.math.GridPoint2;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import ru.mipt.bit.platformer.entities.Field;
+import ru.mipt.bit.platformer.entities.GameField;
 import ru.mipt.bit.platformer.entities.Tree;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 
 class TreeTest {
 
     @Mock
-    private Field field;
+    private GameField field;
 
     private AutoCloseable mocks;
 
@@ -32,11 +31,18 @@ class TreeTest {
 
     @Test
     void shouldHaveInitialPosition() {
-        GridPoint2 position = new GridPoint2(5, 7);
+        GridPoint2 position =
+                new GridPoint2(5, 7);
 
-        Tree tree = new Tree(field, position);
+        Tree tree = new Tree(
+                field,
+                position
+        );
 
-        assertEquals(position, tree.getPosition());
+        assertEquals(
+                position,
+                tree.getPosition()
+        );
     }
 
     @Test
@@ -46,7 +52,9 @@ class TreeTest {
                 new GridPoint2(5, 7)
         );
 
-        GridPoint2 position = tree.getPosition();
+        GridPoint2 position =
+                tree.getPosition();
+
         position.set(100, 100);
 
         assertEquals(
@@ -57,9 +65,13 @@ class TreeTest {
 
     @Test
     void shouldAddObstacleWhenCreated() {
-        GridPoint2 position = new GridPoint2(5, 7);
+        GridPoint2 position =
+                new GridPoint2(5, 7);
 
-        new Tree(field, position);
+        new Tree(
+                field,
+                position
+        );
 
         verify(field).addObstacle(position);
     }

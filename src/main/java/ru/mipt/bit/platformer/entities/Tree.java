@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.Rectangle;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.createBoundingRectangle;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.drawTextureRegionUnscaled;
 
-public class Tree {
+public class Tree implements GameEntity {
 
     private final Texture texture;
     private final TextureRegion graphics;
@@ -17,7 +17,7 @@ public class Tree {
 
     private final GridPoint2 position;
 
-    public Tree(Field field, GridPoint2 position) {
+    public Tree(GameField field, GridPoint2 position) {
         this.position = new GridPoint2(position);
 
         texture = new Texture("images/greenTree.png");
@@ -32,6 +32,12 @@ public class Tree {
         field.addObstacle(this.position);
     }
 
+    @Override
+    public void update(float deltaTime) {
+        // Tree is static.
+    }
+
+    @Override
     public void render(Batch batch) {
         drawTextureRegionUnscaled(
                 batch,
@@ -45,6 +51,7 @@ public class Tree {
         return new GridPoint2(position);
     }
 
+    @Override
     public void dispose() {
         texture.dispose();
     }

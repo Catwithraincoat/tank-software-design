@@ -1,6 +1,5 @@
 package ru.mipt.bit.platformer.entities;
 
-
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.maps.MapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -18,7 +17,7 @@ import static ru.mipt.bit.platformer.util.GdxGameUtils.createSingleLayerMapRende
 import static ru.mipt.bit.platformer.util.GdxGameUtils.getSingleLayer;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.moveRectangleAtTileCenter;
 
-public class Field {
+public class Field implements GameField {
 
     private final TiledMap map;
     private final TiledMapTileLayer tileLayer;
@@ -43,19 +42,23 @@ public class Field {
         );
     }
 
+    @Override
     public void render() {
         renderer.render();
     }
 
+    @Override
     public boolean isBlocked(GridPoint2 position) {
         return isOutsideField(position)
                 || obstacles.contains(position);
     }
 
+    @Override
     public void addObstacle(GridPoint2 position) {
         obstacles.add(new GridPoint2(position));
     }
 
+    @Override
     public void moveRectangleToTileCenter(
             Rectangle rectangle,
             GridPoint2 position
@@ -67,8 +70,19 @@ public class Field {
         );
     }
 
-    public TileMovement getTileMovement() {
-        return tileMovement;
+    @Override
+    public void moveRectangleBetweenTileCenters(
+            Rectangle rectangle,
+            GridPoint2 fromPosition,
+            GridPoint2 toPosition,
+            float progress
+    ) {
+        tileMovement.moveRectangleBetweenTileCenters(
+                rectangle,
+                fromPosition,
+                toPosition,
+                progress
+        );
     }
 
     private boolean isOutsideField(GridPoint2 position) {
@@ -78,6 +92,7 @@ public class Field {
                 || position.y >= tileLayer.getHeight();
     }
 
+    @Override
     public void dispose() {
         map.dispose();
     }

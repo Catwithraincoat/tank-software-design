@@ -5,14 +5,14 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
-import ru.mipt.bit.platformer.util.TileMovement;
+import ru.mipt.bit.platformer.input.InputController;
 
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.continueProgress;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.createBoundingRectangle;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.drawTextureRegionUnscaled;
 
-public class Tank {
+public class Tank implements GameEntity {
 
     private static final float MOVEMENT_SPEED = 0.4f;
 
@@ -20,8 +20,8 @@ public class Tank {
     private final TextureRegion graphics;
     private final Rectangle rectangle;
 
-    private final Field field;
-    private final TileMovement tileMovement;
+    private final GameField field;
+    private final InputController inputController;
 
     private final GridPoint2 position;
     private final GridPoint2 destination;
@@ -30,9 +30,13 @@ public class Tank {
 
     private float movementProgress = 1f;
 
-    public Tank(Field field, GridPoint2 initialPosition) {
+    public Tank(
+            GameField field,
+            GridPoint2 initialPosition,
+            InputController inputController
+    ) {
         this.field = field;
-        this.tileMovement = field.getTileMovement();
+        this.inputController = inputController;
 
         this.position = new GridPoint2(initialPosition);
         this.destination = new GridPoint2(initialPosition);
@@ -49,10 +53,11 @@ public class Tank {
         );
     }
 
+    @Override
     public void update(float deltaTime) {
         handleInput();
 
-        tileMovement.moveRectangleBetweenTileCenters(
+        field.moveRectangleBetweenTileCenters(
                 rectangle,
                 position,
                 destination,
@@ -75,11 +80,11 @@ public class Tank {
             return;
         }
 
-        for (Orientation orientation : Orientation.values()) {
-            if (orientation.isPressed()) {
-                move(orientation);
-                return;
-            }
+        Orientation pressedOrientation =
+                inputController.getPressedOrientation();
+
+        if (pressedOrientation != null) {
+            move(pressedOrientation);
         }
     }
 
@@ -99,6 +104,7 @@ public class Tank {
         this.movementProgress = 0f;
     }
 
+    @Override
     public void render(Batch batch) {
         drawTextureRegionUnscaled(
                 batch,
@@ -116,6 +122,7 @@ public class Tank {
         return orientation;
     }
 
+    @Override
     public void dispose() {
         texture.dispose();
     }

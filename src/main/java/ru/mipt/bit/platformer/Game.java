@@ -6,15 +6,19 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.GridPoint2;
 import ru.mipt.bit.platformer.entities.Field;
+import ru.mipt.bit.platformer.entities.GameEntity;
+import ru.mipt.bit.platformer.entities.GameField;
 import ru.mipt.bit.platformer.entities.Tank;
 import ru.mipt.bit.platformer.entities.Tree;
+import ru.mipt.bit.platformer.input.InputController;
+import ru.mipt.bit.platformer.input.KeyboardInputController;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
 
 public class Game implements ApplicationListener {
-
-    private static final int WINDOW_WIDTH = 1280;
-    private static final int WINDOW_HEIGHT = 1024;
 
     private static final GridPoint2 PLAYER_START_POSITION =
             new GridPoint2(1, 1);
@@ -24,9 +28,8 @@ public class Game implements ApplicationListener {
 
     private Batch batch;
 
-    private Field field;
-    private Tank tank;
-    private Tree tree;
+    private GameField field;
+    private List<GameEntity> entities;
 
     @Override
     public void create() {
@@ -34,12 +37,24 @@ public class Game implements ApplicationListener {
 
         field = new Field(batch);
 
-        tree = new Tree(field, TREE_POSITION);
+        entities = new ArrayList<>();
 
-        tank = new Tank(
+        InputController inputController =
+                new KeyboardInputController();
+
+        Tank tank = new Tank(
                 field,
-                PLAYER_START_POSITION
+                PLAYER_START_POSITION,
+                inputController
         );
+
+        Tree tree = new Tree(
+                field,
+                TREE_POSITION
+        );
+
+        entities.add(tank);
+        entities.add(tree);
     }
 
     @Override
@@ -48,20 +63,29 @@ public class Game implements ApplicationListener {
 
         float deltaTime = Gdx.graphics.getDeltaTime();
 
-        tank.update(deltaTime);
+        for (GameEntity entity : entities) {
+            entity.update(deltaTime);
+        }
 
         field.render();
 
         batch.begin();
 
-        tank.render(batch);
-        tree.render(batch);
+        for (GameEntity entity : entities) {
+            entity.render(batch);
+        }
 
         batch.end();
     }
 
     private void clearScreen() {
-        Gdx.gl.glClearColor(0f, 0f, 0.2f, 1f);
+        Gdx.gl.glClearColor(
+                0f,
+                0f,
+                0.2f,
+                1f
+        );
+
         Gdx.gl.glClear(GL_COLOR_BUFFER_BIT);
     }
 
@@ -82,8 +106,10 @@ public class Game implements ApplicationListener {
 
     @Override
     public void dispose() {
-        tank.dispose();
-        tree.dispose();
+        for (GameEntity entity : entities) {
+            entity.dispose();
+        }
+
         field.dispose();
         batch.dispose();
     }
