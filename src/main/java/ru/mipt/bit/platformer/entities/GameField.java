@@ -1,3 +1,4 @@
+
 package ru.mipt.bit.platformer.entities;
 
 import com.badlogic.gdx.math.GridPoint2;
@@ -10,6 +11,10 @@ public interface GameField {
     boolean isBlocked(GridPoint2 position);
 
     void addObstacle(GridPoint2 position);
+
+    int getWidth();
+
+    int getHeight();
 
     void moveRectangleToTileCenter(
             Rectangle rectangle,

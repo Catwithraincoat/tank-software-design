@@ -96,4 +96,14 @@ public class Field implements GameField {
     public void dispose() {
         map.dispose();
     }
+
+    @Override
+    public int getWidth() {
+        return tileLayer.getWidth();
+    }
+
+    @Override
+    public int getHeight() {
+        return tileLayer.getHeight();
+    }
 }
