@@ -32,6 +32,7 @@ public class FileLevelProvider implements LevelProvider {
         }
 
         List<GridPoint2> trees = new ArrayList<>();
+        List<GridPoint2> aiTanks = new ArrayList<>();
         GridPoint2 playerPosition = null;
 
         try (BufferedReader reader = new BufferedReader(
@@ -69,6 +70,8 @@ public class FileLevelProvider implements LevelProvider {
 
                     if (cell == 'T') {
                         trees.add(position);
+                    } else if (cell == 'A') {
+                        aiTanks.add(position);
                     } else if (cell == 'X') {
                         if (playerPosition != null) {
                             throw new IllegalArgumentException(
@@ -97,6 +100,10 @@ public class FileLevelProvider implements LevelProvider {
             );
         }
 
-        return new LevelData(playerPosition, trees);
+        return new LevelData(
+                playerPosition,
+                trees,
+                aiTanks
+        );
     }
 }

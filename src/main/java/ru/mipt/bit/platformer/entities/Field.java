@@ -10,9 +10,6 @@ import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Rectangle;
 import ru.mipt.bit.platformer.util.TileMovement;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import static ru.mipt.bit.platformer.util.GdxGameUtils.createSingleLayerMapRenderer;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.getSingleLayer;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.moveRectangleAtTileCenter;
@@ -23,8 +20,7 @@ public class Field implements GameField {
     private final TiledMapTileLayer tileLayer;
     private final MapRenderer renderer;
     private final TileMovement tileMovement;
-
-    private final Set<GridPoint2> obstacles = new HashSet<>();
+    private final FieldOccupancy occupancy;
 
     public Field(Batch batch) {
         map = new TmxMapLoader().load("level.tmx");
@@ -40,6 +36,11 @@ public class Field implements GameField {
                 tileLayer,
                 Interpolation.smooth
         );
+
+        occupancy = new FieldOccupancy(
+                tileLayer.getWidth(),
+                tileLayer.getHeight()
+        );
     }
 
     @Override
@@ -49,13 +50,44 @@ public class Field implements GameField {
 
     @Override
     public boolean isBlocked(GridPoint2 position) {
-        return isOutsideField(position)
-                || obstacles.contains(position);
+        return occupancy.isBlocked(position);
     }
 
     @Override
     public void addObstacle(GridPoint2 position) {
-        obstacles.add(new GridPoint2(position));
+        occupancy.addObstacle(position);
+    }
+
+    @Override
+    public void addTank(GridPoint2 position) {
+        occupancy.addTank(position);
+    }
+
+    @Override
+    public boolean tryReserveTankMovement(
+            GridPoint2 fromPosition,
+            GridPoint2 toPosition
+    ) {
+        return occupancy.tryReserveTankMovement(
+                fromPosition,
+                toPosition
+        );
+    }
+
+    @Override
+    public void completeTankMovement(
+            GridPoint2 fromPosition,
+            GridPoint2 toPosition
+    ) {
+        occupancy.completeTankMovement(
+                fromPosition,
+                toPosition
+        );
+    }
+
+    @Override
+    public void removeTank(GridPoint2 position) {
+        occupancy.removeTank(position);
     }
 
     @Override
@@ -83,13 +115,6 @@ public class Field implements GameField {
                 toPosition,
                 progress
         );
-    }
-
-    private boolean isOutsideField(GridPoint2 position) {
-        return position.x < 0
-                || position.x >= tileLayer.getWidth()
-                || position.y < 0
-                || position.y >= tileLayer.getHeight();
     }
 
     @Override

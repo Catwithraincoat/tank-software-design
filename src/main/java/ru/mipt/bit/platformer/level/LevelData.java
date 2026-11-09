@@ -10,17 +10,23 @@ public class LevelData {
 
     private final GridPoint2 playerPosition;
     private final List<GridPoint2> treePositions;
+    private final List<GridPoint2> aiTankPositions;
 
     public LevelData(
             GridPoint2 playerPosition,
             List<GridPoint2> treePositions
     ) {
-        this.playerPosition = new GridPoint2(playerPosition);
-        this.treePositions = new ArrayList<>();
+        this(playerPosition, treePositions, List.of());
+    }
 
-        for (GridPoint2 position : treePositions) {
-            this.treePositions.add(new GridPoint2(position));
-        }
+    public LevelData(
+            GridPoint2 playerPosition,
+            List<GridPoint2> treePositions,
+            List<GridPoint2> aiTankPositions
+    ) {
+        this.playerPosition = new GridPoint2(playerPosition);
+        this.treePositions = copyPositions(treePositions);
+        this.aiTankPositions = copyPositions(aiTankPositions);
     }
 
     public GridPoint2 getPlayerPosition() {
@@ -28,9 +34,19 @@ public class LevelData {
     }
 
     public List<GridPoint2> getTreePositions() {
+        return copyPositions(treePositions);
+    }
+
+    public List<GridPoint2> getAiTankPositions() {
+        return copyPositions(aiTankPositions);
+    }
+
+    private static List<GridPoint2> copyPositions(
+            List<GridPoint2> positions
+    ) {
         List<GridPoint2> result = new ArrayList<>();
 
-        for (GridPoint2 position : treePositions) {
+        for (GridPoint2 position : positions) {
             result.add(new GridPoint2(position));
         }
 

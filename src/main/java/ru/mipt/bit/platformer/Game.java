@@ -12,10 +12,11 @@ import ru.mipt.bit.platformer.entities.Tank;
 import ru.mipt.bit.platformer.entities.Tree;
 import ru.mipt.bit.platformer.input.InputController;
 import ru.mipt.bit.platformer.input.KeyboardInputController;
+import ru.mipt.bit.platformer.strategy.KeyboardTankControlStrategy;
+import ru.mipt.bit.platformer.strategy.RandomTankControlStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
-import ru.mipt.bit.platformer.level.FileLevelProvider;
 import ru.mipt.bit.platformer.level.LevelData;
 import ru.mipt.bit.platformer.level.LevelProvider;
 import ru.mipt.bit.platformer.level.RandomLevelProvider;
@@ -37,33 +38,35 @@ public class Game implements ApplicationListener {
         field = new Field(batch);
         entities = new ArrayList<>();
 
-        InputController inputController =
-                new KeyboardInputController();
-
-        // Выбери один из двух способов создания уровня.
         LevelProvider levelProvider =
-                new FileLevelProvider("level.txt");
-
-        // Для случайной генерации используй вместо
-        // предыдущей строки:
-        // LevelProvider levelProvider =
-        //         new RandomLevelProvider();
+                new RandomLevelProvider();
 
         LevelData level = levelProvider.createLevel(
                 field.getWidth(),
                 field.getHeight()
         );
 
-        Tank tank = new Tank(
-                field,
-                level.getPlayerPosition(),
-                inputController
-        );
-
-        entities.add(tank);
-
         for (GridPoint2 position : level.getTreePositions()) {
             entities.add(new Tree(field, position));
+        }
+
+        InputController inputController =
+                new KeyboardInputController();
+
+        Tank playerTank = new Tank(
+                field,
+                level.getPlayerPosition(),
+                new KeyboardTankControlStrategy(inputController)
+        );
+
+        entities.add(playerTank);
+
+        for (GridPoint2 position : level.getAiTankPositions()) {
+            entities.add(new Tank(
+                    field,
+                    position,
+                    new RandomTankControlStrategy()
+            ));
         }
     }
 

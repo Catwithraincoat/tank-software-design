@@ -6,42 +6,44 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 import ru.mipt.bit.platformer.input.InputController;
+import ru.mipt.bit.platformer.strategy.KeyboardTankControlStrategy;
+import ru.mipt.bit.platformer.strategy.TankControlStrategy;
 
-import static com.badlogic.gdx.math.MathUtils.isEqual;
-import static ru.mipt.bit.platformer.util.GdxGameUtils.continueProgress;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.createBoundingRectangle;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.drawTextureRegionUnscaled;
 
 public class Tank implements GameEntity {
-
-    private static final float MOVEMENT_SPEED = 0.4f;
 
     private final Texture texture;
     private final TextureRegion graphics;
     private final Rectangle rectangle;
 
     private final GameField field;
-    private final InputController inputController;
-
-    private final GridPoint2 position;
-    private final GridPoint2 destination;
-
-    private Orientation orientation;
-
-    private float movementProgress = 1f;
+    private final TankMovement movement;
 
     public Tank(
             GameField field,
             GridPoint2 initialPosition,
             InputController inputController
     ) {
+        this(
+                field,
+                initialPosition,
+                new KeyboardTankControlStrategy(inputController)
+        );
+    }
+
+    public Tank(
+            GameField field,
+            GridPoint2 initialPosition,
+            TankControlStrategy controlStrategy
+    ) {
         this.field = field;
-        this.inputController = inputController;
-
-        this.position = new GridPoint2(initialPosition);
-        this.destination = new GridPoint2(initialPosition);
-
-        this.orientation = Orientation.RIGHT;
+        this.movement = new TankMovement(
+                field,
+                initialPosition,
+                controlStrategy
+        );
 
         texture = new Texture("images/tank_blue.png");
         graphics = new TextureRegion(texture);
@@ -49,59 +51,20 @@ public class Tank implements GameEntity {
 
         field.moveRectangleToTileCenter(
                 rectangle,
-                position
+                movement.getPosition()
         );
     }
 
     @Override
     public void update(float deltaTime) {
-        handleInput();
+        movement.update(deltaTime);
 
         field.moveRectangleBetweenTileCenters(
                 rectangle,
-                position,
-                destination,
-                movementProgress
+                movement.getPosition(),
+                movement.getDestination(),
+                movement.getMovementProgress()
         );
-
-        movementProgress = continueProgress(
-                movementProgress,
-                deltaTime,
-                MOVEMENT_SPEED
-        );
-
-        if (isEqual(movementProgress, 1f)) {
-            position.set(destination);
-        }
-    }
-
-    private void handleInput() {
-        if (!isEqual(movementProgress, 1f)) {
-            return;
-        }
-
-        Orientation pressedOrientation =
-                inputController.getPressedOrientation();
-
-        if (pressedOrientation != null) {
-            move(pressedOrientation);
-        }
-    }
-
-    private void move(Orientation orientation) {
-        GridPoint2 newDestination = new GridPoint2(position)
-                .add(
-                        orientation.getDx(),
-                        orientation.getDy()
-                );
-
-        if (field.isBlocked(newDestination)) {
-            return;
-        }
-
-        this.orientation = orientation;
-        this.destination.set(newDestination);
-        this.movementProgress = 0f;
     }
 
     @Override
@@ -110,20 +73,21 @@ public class Tank implements GameEntity {
                 batch,
                 graphics,
                 rectangle,
-                orientation.getRotation()
+                movement.getOrientation().getRotation()
         );
     }
 
     public GridPoint2 getPosition() {
-        return new GridPoint2(position);
+        return movement.getPosition();
     }
 
     public Orientation getOrientation() {
-        return orientation;
+        return movement.getOrientation();
     }
 
     @Override
     public void dispose() {
+        movement.dispose();
         texture.dispose();
     }
 }

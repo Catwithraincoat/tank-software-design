@@ -12,6 +12,20 @@ public interface GameField {
 
     void addObstacle(GridPoint2 position);
 
+    void addTank(GridPoint2 position);
+
+    boolean tryReserveTankMovement(
+            GridPoint2 fromPosition,
+            GridPoint2 toPosition
+    );
+
+    void completeTankMovement(
+            GridPoint2 fromPosition,
+            GridPoint2 toPosition
+    );
+
+    void removeTank(GridPoint2 position);
+
     int getWidth();
 
     int getHeight();
