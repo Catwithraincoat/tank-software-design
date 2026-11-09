@@ -23,6 +23,8 @@ class TankTest {
         tank.getDestination().set(7, 7);
         assertEquals(new GridPoint2(1, 1), tank.getPosition());
         assertEquals(Orientation.RIGHT, tank.getOrientation());
+        assertEquals(Tank.DEFAULT_HEALTH, tank.getHealth());
+        assertEquals(Tank.DEFAULT_HEALTH, tank.getMaxHealth());
         assertTrue(level.isBlocked(new GridPoint2(1, 1)));
     }
 
@@ -117,6 +119,7 @@ class TankTest {
         Tank target = level.addTank(new GridPoint2(1, 0), t -> NoOpTankCommand.INSTANCE, 30, 10);
         new ShootTankCommand(shooter).execute();
         assertEquals(80, shooter.getHealth());
+        assertEquals(80, shooter.getMaxHealth());
         assertEquals(0, target.getHealth());
         assertFalse(level.contains(target));
         assertFalse(level.isBlocked(target.getPosition()));

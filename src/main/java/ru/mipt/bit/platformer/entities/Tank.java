@@ -19,6 +19,7 @@ public class Tank implements GameEntity {
     private final GridPoint2 position;
     private final GridPoint2 destination;
     private final int bulletDamage;
+    private final int maxHealth;
     private Orientation orientation = Orientation.RIGHT;
     private float progress = 1f;
     private float shotCooldown;
@@ -33,6 +34,7 @@ public class Tank implements GameEntity {
         this.strategy = Objects.requireNonNull(strategy);
         this.position = new GridPoint2(position);
         this.destination = new GridPoint2(position);
+        this.maxHealth = health;
         this.health = health;
         this.bulletDamage = bulletDamage;
     }
@@ -112,6 +114,7 @@ public class Tank implements GameEntity {
 
     public boolean isMoving() { return progress < 1f; }
     public int getHealth() { return health; }
+    public int getMaxHealth() { return maxHealth; }
     public Orientation getOrientation() { return orientation; }
     public float getMovementProgress() { return progress; }
     public GridPoint2 getDestination() { return new GridPoint2(destination); }

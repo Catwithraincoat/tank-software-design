@@ -24,10 +24,20 @@ class KeyboardInputControllerTest {
     }
 
     private void press(Set<Integer> keys) {
+        press(keys, Set.of());
+    }
+
+    private void press(
+            Set<Integer> keys,
+            Set<Integer> justPressedKeys
+    ) {
         Gdx.input = (Input) Proxy.newProxyInstance(Input.class.getClassLoader(),
                 new Class<?>[]{Input.class}, (proxy, method, args) -> {
                     if (method.getName().equals("isKeyPressed")) {
                         return keys.contains((Integer) args[0]);
+                    }
+                    if (method.getName().equals("isKeyJustPressed")) {
+                        return justPressedKeys.contains((Integer) args[0]);
                     }
                     throw new AssertionError("Unexpected input method: " + method.getName());
                 });
@@ -64,5 +74,16 @@ class KeyboardInputControllerTest {
         KeyboardInputController input = new KeyboardInputController();
         assertFalse(input.isShootPressed());
         assertNull(input.getPressedOrientation());
+    }
+
+    @Test
+    void lShouldToggleHealthBarsOnlyOnInitialPress() {
+        KeyboardInputController input = new KeyboardInputController();
+
+        press(Set.of(L), Set.of(L));
+        assertTrue(input.isHealthTogglePressed());
+
+        press(Set.of(L), Set.of());
+        assertFalse(input.isHealthTogglePressed());
     }
 }

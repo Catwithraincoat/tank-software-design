@@ -5,10 +5,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import ru.mipt.bit.platformer.ai.SimpleRecommendationEngine;
-import ru.mipt.bit.platformer.command.TankCommand;
+import ru.mipt.bit.platformer.command.GameCommand;
+import ru.mipt.bit.platformer.command.ToggleHealthBarsCommand;
 import ru.mipt.bit.platformer.entities.Field;
 import ru.mipt.bit.platformer.entities.GameField;
 import ru.mipt.bit.platformer.graphics.GraphicalLevel;
+import ru.mipt.bit.platformer.graphics.HealthBarVisibility;
 import ru.mipt.bit.platformer.graphics.SpriteViewFactory;
 import ru.mipt.bit.platformer.input.KeyboardInputController;
 import ru.mipt.bit.platformer.level.LogicalLevel;
@@ -17,6 +19,7 @@ import ru.mipt.bit.platformer.strategy.KeyboardTankControlStrategy;
 import ru.mipt.bit.platformer.strategy.RecommendationTankControlStrategy;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Random;
 
 import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
@@ -26,18 +29,25 @@ public class Game implements ApplicationListener {
     private GameField field;
     private LogicalLevel level;
     private GraphicalLevel graphics;
+    private KeyboardInputController inputController;
+    private HealthBarVisibility healthBarVisibility;
 
     @Override
     public void create() {
         batch = new SpriteBatch();
         field = new Field(batch);
         level = new LogicalLevel(field.getWidth(), field.getHeight());
+        inputController = new KeyboardInputController();
+        healthBarVisibility = new HealthBarVisibility();
         // Subscribe before loading: initial objects use the same notifications
         // as bullets and destroyed tanks created/removed during the game.
-        graphics = new GraphicalLevel(level, new SpriteViewFactory(field));
+        graphics = new GraphicalLevel(
+                level,
+                new SpriteViewFactory(field, healthBarVisibility)
+        );
         level.initialize(
                 new RandomLevelProvider().createLevel(field.getWidth(), field.getHeight()),
-                new KeyboardTankControlStrategy(new KeyboardInputController()),
+                new KeyboardTankControlStrategy(inputController),
                 () -> new RecommendationTankControlStrategy(
                         new SimpleRecommendationEngine(new Random()), level));
     }
@@ -45,7 +55,10 @@ public class Game implements ApplicationListener {
     @Override
     public void render() {
         // 1. Create commands from keyboard / AI.
-        List<TankCommand> commands = level.createCommands();
+        List<GameCommand> commands = new ArrayList<>(level.createCommands());
+        if (inputController.isHealthTogglePressed()) {
+            commands.add(new ToggleHealthBarsCommand(healthBarVisibility));
+        }
         // 2. Execute the collected commands.
         level.executeCommands(commands);
         // 3. Advance every object's logical state.

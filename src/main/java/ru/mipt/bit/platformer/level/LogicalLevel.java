@@ -2,6 +2,7 @@ package ru.mipt.bit.platformer.level;
 
 import com.badlogic.gdx.math.GridPoint2;
 import ru.mipt.bit.platformer.command.TankCommand;
+import ru.mipt.bit.platformer.command.GameCommand;
 import ru.mipt.bit.platformer.entities.*;
 import ru.mipt.bit.platformer.strategy.TankControlStrategy;
 
@@ -127,8 +128,8 @@ public class LogicalLevel {
     }
 
     /** Phase 2: removed receivers ignore already collected commands. */
-    public void executeCommands(List<TankCommand> commands) {
-        commands.forEach(TankCommand::execute);
+    public void executeCommands(List<? extends GameCommand> commands) {
+        commands.forEach(GameCommand::execute);
     }
 
     /** Phase 3: only advance logical time; never poll input or draw. */
