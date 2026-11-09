@@ -20,7 +20,6 @@ public class Field implements GameField {
     private final TiledMapTileLayer tileLayer;
     private final MapRenderer renderer;
     private final TileMovement tileMovement;
-    private final FieldOccupancy occupancy;
 
     public Field(Batch batch) {
         map = new TmxMapLoader().load("level.tmx");
@@ -37,57 +36,11 @@ public class Field implements GameField {
                 Interpolation.smooth
         );
 
-        occupancy = new FieldOccupancy(
-                tileLayer.getWidth(),
-                tileLayer.getHeight()
-        );
     }
 
     @Override
     public void render() {
         renderer.render();
-    }
-
-    @Override
-    public boolean isBlocked(GridPoint2 position) {
-        return occupancy.isBlocked(position);
-    }
-
-    @Override
-    public void addObstacle(GridPoint2 position) {
-        occupancy.addObstacle(position);
-    }
-
-    @Override
-    public void addTank(GridPoint2 position) {
-        occupancy.addTank(position);
-    }
-
-    @Override
-    public boolean tryReserveTankMovement(
-            GridPoint2 fromPosition,
-            GridPoint2 toPosition
-    ) {
-        return occupancy.tryReserveTankMovement(
-                fromPosition,
-                toPosition
-        );
-    }
-
-    @Override
-    public void completeTankMovement(
-            GridPoint2 fromPosition,
-            GridPoint2 toPosition
-    ) {
-        occupancy.completeTankMovement(
-                fromPosition,
-                toPosition
-        );
-    }
-
-    @Override
-    public void removeTank(GridPoint2 position) {
-        occupancy.removeTank(position);
     }
 
     @Override

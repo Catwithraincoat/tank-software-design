@@ -2,51 +2,43 @@ package ru.mipt.bit.platformer.strategy;
 
 import com.badlogic.gdx.math.GridPoint2;
 import org.junit.jupiter.api.Test;
-import ru.mipt.bit.platformer.TestGameField;
-import ru.mipt.bit.platformer.command.NoOpTankCommand;
-import ru.mipt.bit.platformer.command.TankCommand;
-import ru.mipt.bit.platformer.entities.Orientation;
-import ru.mipt.bit.platformer.entities.TankMovement;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import ru.mipt.bit.platformer.command.*;
+import ru.mipt.bit.platformer.entities.*;
+import ru.mipt.bit.platformer.input.InputController;
+import ru.mipt.bit.platformer.level.LogicalLevel;
+import static org.junit.jupiter.api.Assertions.*;
 
 class KeyboardTankControlStrategyTest {
-
     @Test
-    void shouldReturnNoOpWhenNoKeyIsPressed() {
-        TankMovement tank = newTank();
-        KeyboardTankControlStrategy strategy =
-                new KeyboardTankControlStrategy(() -> null);
-
-        assertSame(
-                NoOpTankCommand.INSTANCE,
-                strategy.nextCommand(tank)
-        );
+    void noInputShouldReturnNoOp() {
+        Tank tank = newTank();
+        assertSame(NoOpTankCommand.INSTANCE,
+                new KeyboardTankControlStrategy(() -> null).nextCommand(tank));
     }
 
     @Test
-    void shouldCreateMoveCommandForPressedDirection() {
-        TankMovement tank = newTank();
-        KeyboardTankControlStrategy strategy =
-                new KeyboardTankControlStrategy(
-                        () -> Orientation.LEFT
-                );
+    void directionShouldCreateMoveCommand() {
+        Tank tank = newTank();
+        new KeyboardTankControlStrategy(() -> Orientation.LEFT).nextCommand(tank).execute();
+        assertEquals(new GridPoint2(0, 1), tank.getDestination());
+    }
 
-        TankCommand command = strategy.nextCommand(tank);
+    @Test
+    void spaceShouldCreateShotAndTakePriorityOverDirection() {
+        Tank tank = newTank();
+        InputController input = new InputController() {
+            public Orientation getPressedOrientation() { return Orientation.UP; }
+            public boolean isShootPressed() { return true; }
+        };
+        TankCommand command = new KeyboardTankControlStrategy(input).nextCommand(tank);
+        assertInstanceOf(ShootTankCommand.class, command);
+        assertFalse(tank.isMoving());
         command.execute();
-
-        assertEquals(
-                new GridPoint2(0, 1),
-                tank.getDestination()
-        );
+        assertFalse(tank.isMoving());
     }
 
-    private static TankMovement newTank() {
-        return new TankMovement(
-                new TestGameField(3, 3),
-                new GridPoint2(1, 1),
-                ignored -> NoOpTankCommand.INSTANCE
-        );
+    private Tank newTank() {
+        return new LogicalLevel(4, 3).addTank(
+                new GridPoint2(1, 1), t -> NoOpTankCommand.INSTANCE);
     }
 }

@@ -1,17 +1,17 @@
 package ru.mipt.bit.platformer.command;
 
 import ru.mipt.bit.platformer.entities.Orientation;
-import ru.mipt.bit.platformer.entities.TankMovement;
+import ru.mipt.bit.platformer.entities.Tank;
 
 import java.util.Objects;
 
 public class MoveTankCommand implements TankCommand {
 
-    private final TankMovement tank;
+    private final Tank tank;
     private final Orientation orientation;
 
     public MoveTankCommand(
-            TankMovement tank,
+            Tank tank,
             Orientation orientation
     ) {
         this.tank = Objects.requireNonNull(tank, "tank");

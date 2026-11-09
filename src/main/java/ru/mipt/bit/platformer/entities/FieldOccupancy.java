@@ -91,6 +91,10 @@ public class FieldOccupancy {
         tanks.remove(position);
     }
 
+    public void removeObstacle(GridPoint2 position) {
+        obstacles.remove(position);
+    }
+
     private void requireRegisteredTank(GridPoint2 position) {
         Objects.requireNonNull(position, "position");
 

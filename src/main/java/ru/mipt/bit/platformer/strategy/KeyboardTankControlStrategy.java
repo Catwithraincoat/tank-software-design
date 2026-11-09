@@ -3,8 +3,9 @@ package ru.mipt.bit.platformer.strategy;
 import ru.mipt.bit.platformer.command.MoveTankCommand;
 import ru.mipt.bit.platformer.command.NoOpTankCommand;
 import ru.mipt.bit.platformer.command.TankCommand;
+import ru.mipt.bit.platformer.command.ShootTankCommand;
 import ru.mipt.bit.platformer.entities.Orientation;
-import ru.mipt.bit.platformer.entities.TankMovement;
+import ru.mipt.bit.platformer.entities.Tank;
 import ru.mipt.bit.platformer.input.InputController;
 
 import java.util.Objects;
@@ -24,7 +25,10 @@ public class KeyboardTankControlStrategy
     }
 
     @Override
-    public TankCommand nextCommand(TankMovement tank) {
+    public TankCommand nextCommand(Tank tank) {
+        if (inputController.isShootPressed()) {
+            return new ShootTankCommand(tank);
+        }
         Orientation pressedOrientation =
                 inputController.getPressedOrientation();
 

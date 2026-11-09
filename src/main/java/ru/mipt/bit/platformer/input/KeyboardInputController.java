@@ -2,7 +2,6 @@ package ru.mipt.bit.platformer.input;
 
 import com.badlogic.gdx.Gdx;
 import ru.mipt.bit.platformer.entities.Orientation;
-import ru.mipt.bit.platformer.input.InputController;
 
 import static com.badlogic.gdx.Input.Keys.A;
 import static com.badlogic.gdx.Input.Keys.D;
@@ -14,6 +13,11 @@ import static com.badlogic.gdx.Input.Keys.UP;
 import static com.badlogic.gdx.Input.Keys.W;
 
 public class KeyboardInputController implements InputController {
+
+    @Override
+    public boolean isShootPressed() {
+        return Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.SPACE);
+    }
 
     @Override
     public Orientation getPressedOrientation() {

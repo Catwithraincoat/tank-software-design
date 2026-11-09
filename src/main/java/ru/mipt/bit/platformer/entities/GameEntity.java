@@ -1,12 +1,9 @@
 package ru.mipt.bit.platformer.entities;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.GridPoint2;
 
+/** An object of the logical level. Has no dependency on graphics. */
 public interface GameEntity {
-
-    void update(float deltaTime);
-
-    void render(Batch batch);
-
-    void dispose();
+    GridPoint2 getPosition();
+    void live(float tick);
 }

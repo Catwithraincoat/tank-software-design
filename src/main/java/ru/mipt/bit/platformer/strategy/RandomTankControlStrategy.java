@@ -2,8 +2,9 @@ package ru.mipt.bit.platformer.strategy;
 
 import ru.mipt.bit.platformer.command.MoveTankCommand;
 import ru.mipt.bit.platformer.command.TankCommand;
+import ru.mipt.bit.platformer.command.ShootTankCommand;
 import ru.mipt.bit.platformer.entities.Orientation;
-import ru.mipt.bit.platformer.entities.TankMovement;
+import ru.mipt.bit.platformer.entities.Tank;
 
 import java.util.Objects;
 import java.util.Random;
@@ -22,11 +23,13 @@ public class RandomTankControlStrategy
     }
 
     @Override
-    public TankCommand nextCommand(TankMovement tank) {
+    public TankCommand nextCommand(Tank tank) {
         Orientation[] orientations = Orientation.values();
-        Orientation orientation = orientations[
-                random.nextInt(orientations.length)
-        ];
+        int choice = random.nextInt(orientations.length + 1);
+        if (choice == orientations.length) {
+            return new ShootTankCommand(tank);
+        }
+        Orientation orientation = orientations[choice];
 
         return new MoveTankCommand(tank, orientation);
     }
